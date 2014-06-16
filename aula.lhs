@@ -55,7 +55,7 @@ Funções são definidas da seguinte maneira:
 Esta função dobra o número passado por parâmetro. Como podemos fazer uma função
 que quadriplica um número?
 
-> quadrupleMe = doubleMe . doubleMe
+> --quadrupleMe = doubleMe . doubleMe
 
 E para dobrar apenas números menores que 100?
 
@@ -225,47 +225,6 @@ Criamos uma lista de infinitas raízes perfeitas. O que acontece se checarmos a
 posição número 2000 a lista 2 vezes?
 
 
-Entrada e saída
-===============
-
-Uma explicação do caminho de Haskell:
-
-https://www.youtube.com/watch?v=iSmkqocn0oQ
-
-O caminho de Haskell foi diferente das outras linguagens. Ela começou
-completamente pura e tem caminhado para colocar efeito colateral na linguagem
-sem perder sua pureza. Fazer IO e continuar pura foi um grande trabalho de
-pesquisa dos desenvolvedores da linguagem.
-
-O tipo da função main é
-
-    main :: IO ()
-
-estamos dentro da monad IO. Vamos arriscar um Hello world:
-
-> helloWorld = putStrLn "hello world!"
-
-Mas a gente muitas vezes quer criar uma série de passos (programação
-imperativa). Vamos fazer programação imperativa em Haskell!
-
-> displayPerfectSquare = do
->     putStrLn "Qual raíz perfeita você quer?"
->     line <- getLine
->     putStrLn (show (perfectSquares !! read line))
->     displayPerfectSquare
-
-E se a pessoa digitar um número inválido?
-
-> displayPerfectSquare' = do
->     putStrLn "Qual raíz perfeita você quer?"
->     line <- getLine
->     result <- try (evaluate (read line)) :: IO (Either ErrorCall Int)
->     case result of
->         Left _ -> putStrLn "Número inválido"
->         Right index -> putStrLn (show (perfectSquares !! index))
->     displayPerfectSquare
-
-
 Tipos de dados
 ==============
 
@@ -273,21 +232,23 @@ Vamos fazer funções para registrar quem está em um prédio. Uma pessoa pode s
 um funcionário ou um visitante. O visitante tem um nome e uma matricula. O
 visitante, apenas o nome.
 
-> data Person = Employee String Int | Visitor String
+> type Registration = Int
+> type Name = String
+> data Person = Employee Name Registration | Visitor Name
 
 Como encontraríamos um empregado por um número de matrícula?
 
-> findEmployeeByRegistration :: Int -> [Person] -> Person
-> findEmployeeByRegistration registration ((Employee name r):xs) =
+> findEmployee :: Registration -> [Person] -> Person
+> findEmployee registration ((Employee name r):xs) =
 >     if r == registration
 >         then Employee name r
->         else findEmployeeByRegistration registration xs
-> findEmployeeByRegistration registration ((Visitor _):xs) = findEmployeeByRegistration registration xs
+>         else findEmployee registration xs
+> findEmployee registration ((Visitor _):xs) = findEmployee registration xs
 
 Mas quando a gente tenta encontrar um empregado no interpretador as coisas não
 funcionam:
 
-    ghci> findEmployeeByRegistration 2027 [Visitor "Joana", Employee "Marcos" 2027]
+    ghci> findEmployee 2027 [Visitor "Joana", Employee "Marcos" 2027]
     <interactive>:141:1:
         No instance for (Show Person)
           arising from a use of `print'
@@ -306,7 +267,7 @@ Mas nosso tipo não é uma instancia de Show. Vamos corrigir isso:
 >     show (Visitor name) = "Visitante (Nome: " ++ name ++ ")"
 >     show (Employee name registration) = "Empregado (Nome: " ++ name ++ ", Matrícula: " ++ show registration ++ ")"
 
-    ghci> findEmployeeByRegistration 2027 [Visitor "Joana", Employee "Marcos" 2027]
+    ghci> findEmployee 2027 [Visitor "Joana", Employee "Marcos" 2027]
     Empregado
         Nome: Marcos
         Matrícula: 2027
@@ -314,10 +275,10 @@ Mas nosso tipo não é uma instancia de Show. Vamos corrigir isso:
 Mas e se não existir o empregado com a matrícula que a gente quer? E se a lista
 for vazia?
 
-    ghci> findEmployeeByRegistration 2027 [Visitor "Joana", Employee "Marcos" 202]
-    *** Exception: aula.lhs:(281,3)-(285,103): Non-exhaustive patterns in function findEmployeeByRegistration
-    ghci> findEmployeeByRegistration 2027 []
-    *** Exception: aula.lhs:(281,3)-(285,103): Non-exhaustive patterns in function findEmployeeByRegistration
+    ghci> findEmployee 2027 [Visitor "Joana", Employee "Marcos" 202]
+    *** Exception: aula.lhs:(281,3)-(285,103): Non-exhaustive patterns in function findEmployee
+    ghci> findEmployee 2027 []
+    *** Exception: aula.lhs:(281,3)-(285,103): Non-exhaustive patterns in function findEmployee
 
 O que retornar nesse caso? Vamos deixar esse erro? Lembra como era difícil
 resolver isso no código com efeitos colaterais?
@@ -328,10 +289,41 @@ Vamos usar um outro tipo chamado Maybe. A definição do Maybe é assim:
 
 Vamos refazer nossa função agora.
 
-> findEmployeeByRegistration' :: Int -> [Person] -> Maybe Person
-> findEmployeeByRegistration' registration ((Employee name r):xs) =
+> findEmployee' :: Registration -> [Person] -> Maybe Person
+> findEmployee' registration ((Employee name r):xs) =
 >     if r == registration
 >         then Just (Employee name r)
->         else findEmployeeByRegistration' registration xs
-> findEmployeeByRegistration' registration ((Visitor _):xs) = findEmployeeByRegistration' registration xs
-> findEmployeeByRegistration' _ [] = Nothing
+>         else findEmployee' registration xs
+> findEmployee' registration ((Visitor _):xs) = findEmployee' registration xs
+> findEmployee' _ [] = Nothing
+
+
+IO
+==
+
+> helloWorld = putStrLn "Hello World"
+
+> askName = do
+>   putStrLn "Qual o seu nome?"
+>   line <- getLine
+>   putStrLn ("Olá, " ++ line)
+
+> reverseName = do
+>   putStrLn "Qual o seu nome?"
+>   line <- getLine
+>   putStrLn ("Olá, " ++ (reverse line))
+
+> displayPerfectSquare = do
+>     putStrLn "Qual raíz perfeita você quer?"
+>     line <- getLine
+>     putStrLn (show (perfectSquares !! read line))
+>     displayPerfectSquare
+
+> displayPerfectSquare' = do
+>     putStrLn "Qual raíz perfeita você quer?"
+>     line <- getLine
+>     result <- try (evaluate (read line)) :: IO (Either ErrorCall Int)
+>     case result of
+>         Left _ -> putStrLn "Número inválido"
+>         Right index -> putStrLn (show (perfectSquares !! index))
+>     displayPerfectSquare
