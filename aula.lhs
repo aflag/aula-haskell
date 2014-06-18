@@ -98,6 +98,9 @@ Concatenação de listas pode ser feita com o operador ++.
     ghci> arbitraryList ++ [1..7]
     [4,2,5,7,13,88,1,2,3,4,5,6,7]
 
+
+> append list x = list ++ [x]
+
 Concatenar com ++ é uma operação linear. Podemos só colocar um elemento na
 frente da lista (não precisa percorrer a lista toda):
 
@@ -179,6 +182,7 @@ Também funciona para listas:
 Nosso head
 
 > head' :: [a] -> a
+> head' [] = error "empty list"
 > head' (x:_) = x
 
 Recursão!
