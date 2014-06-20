@@ -119,4 +119,57 @@ utilizando infix order.
 > treeToList Null = []
 > treeToList (Node x left right) = (treeToList left) ++ [x] ++ (treeToList right)
 
-7. bind [2,3,5] (\x -> bind [7,11] (\y -> [(x,y)]))
+7. A função passada por parâmetro deve transformar cada elemento da lista [a]
+em uma lista. As listas geradas pela função são concatenadas.
+
+Minha ideia é chamar bind com a lista [2,3,5]. Para cada elemento da lista, nós
+chamamos bind de novo com a lista [7,11]. No final, isso fará com que, para
+cada elemento de [2,3,5], percorramos a lista [7,11].
+
+> bind :: [a] -> (a -> [b]) -> [b]
+> bind [] _ = []
+> bind (x:xs) f = f x ++ (bind xs f)
+
+> cartesianProduct :: [a] -> [b] -> [(a,b)]
+> cartesianProduct l1 l2 = bind l1 (\x -> bind l2 (\y -> [(x,y)]))
+
+    ghci> cartesianProduct [2,3,5] [7,11]
+    [(2,7),(2,11),(3,7),(3,11),(5,7),(5,11)]
+
+Quando estivermos processando 2, o segundo bind irá gerar
+
+    [(2,7)] ++ [(2,11)]
+    [(2,7), (2,11)]
+
+O primeiro bind irá concatenar essa lista à lista
+
+    [(3,7), (3,11)]
+
+e
+
+    [(5,7), (5,11)]
+
+No final, obteremos nosso produto cartesiano.
+
+De onde surgiu essa função bind? Essa é a função mais importante na definição
+de uma monad. Em haskell, a função bind é representada por >>=
+
+Reescrevendo o nosso produto cartesiano usando >>= fica assim:
+
+> cartesianProduct' :: [a] -> [b] -> [(a,b)]
+> cartesianProduct' l1 l2 = l1 >>= (\x -> l2 >>= (\y -> [(x,y)]))
+
+Existe um syntax sugar em haskell para escrever essa mesma expressão usando a
+notação do:
+
+> cartesianProduct'' :: [a] -> [b] -> [(a,b)]
+> cartesianProduct'' l1 l2 = do
+>     x <- l1
+>     y <- l2
+>     [(x,y)]
+
+Implementamos a função bind igual a monad [] implementa a >>= dela. Existem
+várias Monads em Haskell, além da IO monad.
+
+Este é apenas nosso primeiro contato com Monads. Mas já é possível ver como a
+coisa é poderosa.
