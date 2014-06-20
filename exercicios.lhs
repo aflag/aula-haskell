@@ -5,7 +5,7 @@ Estes são alguns exercícios que, acredito, irão ajudar na compreensão da
 linguagem Haskell. Coloquei as soluções em um arquivo separado para não
 dar nenhum spoiler, mas sinta-se livre para usá-las como preferir.
 
-Este arquivo .lhs é um código literate haskell. Isto significa que, por
+Este arquivo .lhs é um código literate Haskell. Isto significa que, por
 padrão, tudo que estiver escrito neste arquivo é comentário. Apenas
 linhas que começam com > são códigos. Para carregar este arquivo, abra o
 ghci e digite :l exercicios.lhs
@@ -45,7 +45,7 @@ Definição de Maybe:
     
 > data List a = Cons a (List a) | Null deriving Show
 
-Repare que, na definição de um tipo, os parâmetros dos contrutores são
+Repare que, na definição de um tipo, os parâmetros dos construtores são
 tipos. Podendo, inclusive, ser o tipo que estamos definindo.
 
 Com esse tipo, podemos criar a lista de inteiros [1,2,3] da seguinte
@@ -108,7 +108,7 @@ Note que você provavelmente terá de chamar bind mais de uma vez.
 
 
 
-[1] Em python, algo parecido seria:
+[1] Em Python, algo parecido seria:
 
     def add(x,y):
         return x+y
