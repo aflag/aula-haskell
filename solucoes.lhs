@@ -1,3 +1,7 @@
+> {-# LANGUAGE TemplateHaskell #-}
+> import Test.QuickCheck
+> import Test.QuickCheck.All
+
 Introdução
 ==========
 
@@ -104,7 +108,7 @@ apenas no container e não no conteúdo dele.
 
 4.
 
-> data BinaryTree a = Node a (BinaryTree a) (BinaryTree a) | Null deriving Show
+> data BinaryTree a = Node a (BinaryTree a) (BinaryTree a) | Null deriving (Show, Eq)
 
 5.
 
@@ -196,3 +200,26 @@ O interessante dessa Monad de lista é que nós podemos escrever um
 algoritmo não determinístico como se fosse uma lista de passos
 determinísticos. Cada Monad irá criar um contexto de computação que irá
 nos auxiliar a fazer determinados tipos de algoritmos.
+
+
+Testes
+======
+
+Vamos fazer alguns testes na árvore que criamos.
+
+> prop_equal_sizes tree = 
+>   length (treeToList tree) == treeLength tree
+>  where
+>   treeLength Null = 0
+>   treeLength (Node _ left right) = 1 + treeLength left + treeLength right
+
+
+> instance Arbitrary a => Arbitrary (BinaryTree a) where
+>   arbitrary = sized arbTree
+
+> arbTree 0 = return Null
+> arbTree n = do
+>   x <- arbitrary
+>   left <- frequency [(1, return Null), (2, arbTree (n `div` 2))]
+>   right <- frequency [(1, return Null), (2, arbTree (n `div` 2))]
+>   return $ Node x left right

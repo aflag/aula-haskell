@@ -331,3 +331,18 @@ IO
 >         Left _ -> putStrLn "Número inválido"
 >         Right index -> putStrLn (show (perfectSquares !! index))
 >     displayPerfectSquare
+
+Classe de booleanaveis
+
+> class Booleanable a where
+>   toBool :: a -> Bool
+> instance Booleanable [a] where
+>   toBool [] = False
+>   toBool _ = True
+> instance Booleanable Bool where
+>   toBool = id
+
+> if' :: Booleanable b => b -> a -> a -> a
+> if' cond ok other
+>   | toBool cond = ok
+>   | otherwise = other
