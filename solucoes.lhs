@@ -9,7 +9,7 @@ Este arquivo .lhs é um código literate Haskell. Isto significa que, por
 padrão, tudo que estiver escrito neste arquivo é comentário. Apenas
 linhas que começam com > são código. Para carregar este arquivo, abra o
 ghci e digite :l solucoes.lhs
-    
+
     % ghci
     ghci> :l solucoes.lhs
 
@@ -155,7 +155,7 @@ Agora vamos à definição da função:
 
 Quando x=2 (o bind mais externo irá chamar a função lambda com esse
 valor), o bind dentro da função lambda, com auxilio do lambda que recebe
-y,irá fazer o seguinte:
+y, irá fazer o seguinte:
 
     [(2,7)] ++ [(2,11)]
     [(2,7), (2,11)]
@@ -185,7 +185,7 @@ notação do:
 > cartesianProduct'' l1 l2 = do
 >     x <- l1
 >     y <- l2
->     [(x,y)]
+>     return (x,y)
 
 Implementamos a função bind igual a Monad [] (a instanciação de Monad
 pela lista) implementa a >>= dela. Existem várias Monads em Haskell,

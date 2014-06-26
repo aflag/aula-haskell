@@ -9,7 +9,7 @@ Este arquivo .lhs é um código literate Haskell. Isto significa que, por
 padrão, tudo que estiver escrito neste arquivo é comentário. Apenas
 linhas que começam com > são códigos. Para carregar este arquivo, abra o
 ghci e digite :l exercicios.lhs
-    
+
     % ghci
     ghci> :l exercicios.lhs
 
@@ -42,7 +42,7 @@ Definição de Maybe:
     data Maybe a = Just a | Nothing
 
 3. Listas podem ser definidas da seguinte maneira:
-    
+
 > data List a = Cons a (List a) | Null deriving Show
 
 Repare que, na definição de um tipo, os parâmetros dos construtores são
